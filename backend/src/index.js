@@ -7,6 +7,7 @@ import domainRoute from "../routes/domain.js";
 import shortnerRoute from "../routes/shortner.js";
 import redirectRoute from "../routes/redirect.js";
 import { authMiddleware } from "../middlewares/auth.js";
+import cors from "cors";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // global midddlewares
+app.use("/api", cors({ origin: process.env.ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

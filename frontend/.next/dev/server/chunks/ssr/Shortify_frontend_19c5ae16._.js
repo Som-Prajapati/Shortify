@@ -360,17 +360,18 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node
 var __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/Shortify/frontend/node_modules/lucide-react/dist/esm/icons/x.js [app-ssr] (ecmascript) <export default as X>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Shortify/frontend/components/ui/button.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Shortify/frontend/components/ui/input.tsx [app-ssr] (ecmascript)");
-'use client';
+"use client";
 ;
 ;
 ;
 ;
 ;
 function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
-    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
-    const [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
-    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
+    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const handleSubmit = async (e)=>{
         e.preventDefault();
         setLoading(true);
@@ -378,9 +379,9 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
         setTimeout(()=>{
             setLoading(false);
             onSuccess();
-            setEmail('');
-            setPassword('');
-            setName('');
+            setEmail("");
+            setPassword("");
+            setName("");
         }, 1000);
     };
     if (!isOpen) return null;
@@ -396,42 +397,42 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                         className: "w-5 h-5"
                     }, void 0, false, {
                         fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                        lineNumber: 45,
+                        lineNumber: 53,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 41,
+                    lineNumber: 49,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                     className: "text-2xl font-bold mb-2",
-                    children: mode === 'login' ? 'Welcome Back' : 'Create Account'
+                    children: mode === "login" ? "Welcome Back" : "Create Account"
                 }, void 0, false, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 48,
+                    lineNumber: 56,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                     className: "text-muted-foreground mb-6",
-                    children: mode === 'login' ? 'Sign in to your account to continue' : 'Join Shortify to start creating links'
+                    children: mode === "login" ? "Sign in to your account to continue" : "Join Shortify to start creating links"
                 }, void 0, false, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 51,
+                    lineNumber: 59,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                     onSubmit: handleSubmit,
                     className: "space-y-4",
                     children: [
-                        mode === 'signup' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        mode === "signup" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                     className: "text-sm font-medium block mb-1",
                                     children: "Name"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 60,
+                                    lineNumber: 68,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -442,13 +443,13 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 61,
+                                    lineNumber: 69,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 59,
+                            lineNumber: 67,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -458,7 +459,7 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     children: "Email"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 72,
+                                    lineNumber: 80,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -469,13 +470,13 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 73,
+                                    lineNumber: 81,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 71,
+                            lineNumber: 79,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -485,7 +486,7 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     children: "Password"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 83,
+                                    lineNumber: 91,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -496,16 +497,16 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     required: true
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 84,
+                                    lineNumber: 92,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 82,
+                            lineNumber: 90,
                             columnNumber: 11
                         }, this),
-                        mode === 'signup' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                        mode === "signup" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                             className: "flex items-center gap-2 text-sm",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -514,30 +515,30 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     className: "rounded"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 95,
+                                    lineNumber: 103,
                                     columnNumber: 15
                                 }, this),
                                 "I agree to the terms and conditions"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 94,
+                            lineNumber: 102,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                             type: "submit",
                             className: "w-full bg-primary hover:bg-primary/90",
                             disabled: loading,
-                            children: loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Sign Up'
+                            children: loading ? "Please wait..." : mode === "login" ? "Sign In" : "Sign Up"
                         }, void 0, false, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 100,
+                            lineNumber: 108,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 57,
+                    lineNumber: 65,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -548,7 +549,7 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                             children: "Or continue with"
                         }, void 0, false, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 110,
+                            lineNumber: 122,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -561,7 +562,7 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     children: "Google"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 112,
+                                    lineNumber: 126,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -571,7 +572,7 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     children: "GitHub"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 113,
+                                    lineNumber: 129,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -581,19 +582,19 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                                     children: "Discord"
                                 }, void 0, false, {
                                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                    lineNumber: 114,
+                                    lineNumber: 132,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                            lineNumber: 111,
+                            lineNumber: 125,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 109,
+                    lineNumber: 121,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -601,36 +602,36 @@ function AuthModal({ isOpen, onClose, mode, onModeChange, onSuccess }) {
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                         className: "text-sm text-muted-foreground",
                         children: [
-                            mode === 'login' ? "Don't have an account? " : 'Already have an account? ',
+                            mode === "login" ? "Don't have an account? " : "Already have an account? ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Shortify$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>onModeChange(mode === 'login' ? 'signup' : 'login'),
+                                onClick: ()=>onModeChange(mode === "login" ? "signup" : "login"),
                                 className: "text-primary hover:underline font-medium",
-                                children: mode === 'login' ? 'Sign up' : 'Sign in'
+                                children: mode === "login" ? "Sign up" : "Sign in"
                             }, void 0, false, {
                                 fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                                lineNumber: 121,
+                                lineNumber: 143,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                        lineNumber: 119,
+                        lineNumber: 139,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-                    lineNumber: 118,
+                    lineNumber: 138,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-            lineNumber: 40,
+            lineNumber: 48,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/Shortify/frontend/components/auth-modal.tsx",
-        lineNumber: 39,
+        lineNumber: 47,
         columnNumber: 5
     }, this);
 }

@@ -1,6 +1,20 @@
 import User from "../models/user.js";
 import { sign } from "../services/auth.js";
 
+export const handleGetCurrentUser = async (req, res) => {
+  try {
+    return res.status(200).json({
+      user: {
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.name,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
 export const handleLogoutUser = async (req, res) => {
   try {
     const token = req.cookies?.Token;
@@ -46,7 +60,7 @@ export const handleLoginUser = async (req, res) => {
     });
 
     return res.status(200).json({
-      message: "User loggin successful",
+      message: "User login successful",
       user: {
         id: user._id,
         name: user.name,
@@ -66,7 +80,8 @@ export const handleRegisterUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     const userExist = await User.findUserByEmail(email);
-    if (userExist) return res.status(400).json({ message: "User Exits" });
+    if (userExist)
+      return res.status(400).json({ message: "User Already Exits" });
 
     const user = new User({
       name: name,
