@@ -9,9 +9,7 @@ export const handleFetchDomains = async (req, res) => {
     const userDomain = await Domain.getDomainList(user_id);
 
     const admin = await User.findUserByEmail(process.env.ADMIN_EMAIL);
-    const admin_id = admin._id;
-
-    const adminDomain = await Domain.getDomainList(admin_id);
+    const adminDomain = admin ? await Domain.getDomainList(admin._id) : [];
 
     const result = { domainList: [...userDomain, ...adminDomain] };
 

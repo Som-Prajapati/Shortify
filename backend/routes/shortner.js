@@ -2,7 +2,7 @@ import express from "express";
 import {
   handleCheckAvailability,
   handleCreateShortner,
-  handleGetAnalytics,
+  handleGetAllShortners,
   handleToggleIsActive,
   handleDeleteShortner,
 } from "../controllers/shortner.js";
@@ -27,7 +27,7 @@ router.get(
   handleCheckAvailability
 );
 
-router.get("/:id", handleGetAnalytics);
+router.get("/", handleGetAllShortners);
 router.patch(
   "/:id",
   toggleIsActiveValidationRules(),

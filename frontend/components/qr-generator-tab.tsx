@@ -1,54 +1,133 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Copy, Download, QrCode, Zap } from 'lucide-react'
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Copy, Download, QrCode, Zap, Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
+import QRCode from "qrcode";
+import { toast } from "sonner";
+import api from "@/lib/api";
 
 interface QRGeneratorTabProps {
-  isLoggedIn: boolean
-  onLoginRequired: () => void
+  isLoggedIn: boolean;
+  onLoginRequired: () => void;
 }
 
-export default function QRGeneratorTab({ 
-  isLoggedIn, 
-  onLoginRequired 
+export default function QRGeneratorTab({
+  isLoggedIn,
+  onLoginRequired,
 }: QRGeneratorTabProps) {
-  const [qrInput, setQrInput] = useState('')
-  const [qrType, setQrType] = useState('url')
-  const [qrSize, setQrSize] = useState('200')
-  const [generated, setGenerated] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [qrInput, setQrInput] = useState("");
+  const [qrType, setQrType] = useState("url");
+  const [qrSize, setQrSize] = useState("250");
+  const [generatedQRUrl, setGeneratedQRUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleGenerateQR = () => {
+  const handleGenerateQR = async () => {
     if (!isLoggedIn) {
-      onLoginRequired()
-      return
+      onLoginRequired();
+      return;
     }
 
     if (!qrInput) {
-      alert('Please enter content to generate QR code')
-      return
+      toast.error("Please enter content to generate QR code");
+      return;
     }
 
-    setGenerated(true)
-  }
+    let formattedContent = qrInput.trim();
+    if (qrType === "email" && !formattedContent.startsWith("mailto:")) {
+      formattedContent = `mailto:${formattedContent}`;
+    } else if (qrType === "phone" && !formattedContent.startsWith("tel:")) {
+      formattedContent = `tel:${formattedContent}`;
+    } else if (qrType === "url" && !/^https?:\/\//i.test(formattedContent)) {
+      formattedContent = `https://${formattedContent}`;
+    }
+
+    setLoading(true);
+
+    try {
+      // Create it in backend
+      await api.post("/qrcode/create", {
+        type: qrType,
+        size: Number(qrSize),
+        content: formattedContent,
+      });
+
+      // Generate QR Code image base64 locally
+      const qrDataUrl = await QRCode.toDataURL(formattedContent, {
+        width: Number(qrSize),
+        margin: 2,
+        errorCorrectionLevel: "H",
+        color: {
+          dark: "#000000",
+          light: "#ffffff",
+        },
+      });
+
+      setGeneratedQRUrl(qrDataUrl);
+      toast.success("QR Code Generated & Saved Successfully!");
+    } catch (error: any) {
+      console.error(error);
+      if (error.response?.status === 409) {
+        // Even if it already exists, display the QR code
+        const qrDataUrl = await QRCode.toDataURL(formattedContent, {
+          width: Number(qrSize),
+          margin: 2,
+        });
+        setGeneratedQRUrl(qrDataUrl);
+        toast.info(
+          "QR Code for this content was already saved. Generated locally.",
+        );
+      } else {
+        toast.error("Failed to generate/save QR Code");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDownload = () => {
-    alert('QR code downloaded!')
-  }
+    if (!generatedQRUrl) return;
 
-  const handleCopy = () => {
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    const link = document.createElement("a");
+    link.href = generatedQRUrl;
+    link.download = `qrcode-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("QR Code Downloaded!");
+  };
+
+  const handleCopy = async () => {
+    try {
+      if (generatedQRUrl) {
+        const response = await fetch(generatedQRUrl);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob,
+          }),
+        ]);
+        toast.success("QR Image Copied to Clipboard!");
+      } else {
+        await navigator.clipboard.writeText(qrInput);
+        toast.success("Link/Text Copied!");
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy", err);
+      toast.error("Failed to copy image to clipboard");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -68,15 +147,41 @@ export default function QRGeneratorTab({
               <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
                 Content Type
               </label>
-              <Select value={qrType} onValueChange={setQrType}>
+              <Select
+                value={qrType}
+                onValueChange={(val) => {
+                  setQrType(val);
+                  setGeneratedQRUrl("");
+                }}
+              >
                 <SelectTrigger className="text-xs sm:text-sm h-11 sm:h-10 rounded-lg border-2 border-border/50 focus:border-primary/50 focus:shadow-lg focus:shadow-primary/10 transition-all duration-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
-                  <SelectItem value="url" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">URL</SelectItem>
-                  <SelectItem value="text" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Text</SelectItem>
-                  <SelectItem value="email" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Email</SelectItem>
-                  <SelectItem value="phone" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Phone</SelectItem>
+                  <SelectItem
+                    value="url"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    URL
+                  </SelectItem>
+                  <SelectItem
+                    value="text"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Text
+                  </SelectItem>
+                  <SelectItem
+                    value="email"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Email
+                  </SelectItem>
+                  <SelectItem
+                    value="phone"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Phone
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -85,15 +190,41 @@ export default function QRGeneratorTab({
               <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
                 QR Code Size
               </label>
-              <Select value={qrSize} onValueChange={setQrSize}>
+              <Select
+                value={qrSize}
+                onValueChange={(val) => {
+                  setQrSize(val);
+                  setGeneratedQRUrl("");
+                }}
+              >
                 <SelectTrigger className="text-xs sm:text-sm h-11 sm:h-10 rounded-lg border-2 border-border/50 focus:border-primary/50 focus:shadow-lg focus:shadow-primary/10 transition-all duration-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
-                  <SelectItem value="150" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Small (150px)</SelectItem>
-                  <SelectItem value="200" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Medium (200px)</SelectItem>
-                  <SelectItem value="300" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Large (300px)</SelectItem>
-                  <SelectItem value="500" className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10">Extra Large (500px)</SelectItem>
+                  <SelectItem
+                    value="150"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Small (150px)
+                  </SelectItem>
+                  <SelectItem
+                    value="250"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Medium (250px)
+                  </SelectItem>
+                  <SelectItem
+                    value="500"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Large (500px)
+                  </SelectItem>
+                  <SelectItem
+                    value="1000"
+                    className="text-xs sm:text-sm cursor-pointer hover:bg-primary/10"
+                  >
+                    Extra Large (1000px)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -101,33 +232,63 @@ export default function QRGeneratorTab({
 
           <div className="group">
             <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
-              {qrType === 'url' ? 'URL' : qrType === 'email' ? 'Email Address' : qrType === 'phone' ? 'Phone Number' : 'Text'}
+              {qrType === "url"
+                ? "URL"
+                : qrType === "email"
+                  ? "Email Address"
+                  : qrType === "phone"
+                    ? "Phone Number"
+                    : "Text"}
             </label>
             <Input
-              type={qrType === 'url' ? 'url' : 'text'}
-              placeholder={qrType === 'url' ? 'https://example.com' : qrType === 'email' ? 'name@example.com' : qrType === 'phone' ? '+1 234 567 8900' : 'Enter your text...'}
+              type={qrType === "url" ? "url" : "text"}
+              placeholder={
+                qrType === "url"
+                  ? "https://example.com"
+                  : qrType === "email"
+                    ? "name@example.com"
+                    : qrType === "phone"
+                      ? "+1 234 567 8900"
+                      : "Enter your text..."
+              }
               value={qrInput}
-              onChange={(e) => setQrInput(e.target.value)}
+              onChange={(e) => {
+                setQrInput(e.target.value);
+                setGeneratedQRUrl("");
+              }}
               className="text-xs sm:text-sm pl-4 py-3 sm:py-3.5 rounded-lg border-2 border-border/50 focus:border-primary/50 focus:shadow-lg focus:shadow-primary/10 transition-all duration-300 bg-card/50 backdrop-blur-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleGenerateQR();
+                }
+              }}
             />
           </div>
 
-          {generated && (
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-6 sm:p-8 rounded-lg border border-primary/20 backdrop-blur-sm flex flex-col items-center">
-              <p className="text-xs sm:text-sm font-semibold text-foreground/70 mb-6">Your QR Code:</p>
+          {generatedQRUrl && (
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-6 sm:p-8 rounded-lg border border-primary/20 backdrop-blur-sm flex flex-col items-center animate-in fade-in zoom-in duration-300">
+              <p className="text-xs sm:text-sm font-semibold text-foreground/70 mb-6">
+                Your QR Code:
+              </p>
               <div className="relative mb-6">
-                <div 
-                  className="bg-white p-6 rounded-lg border-4 border-gradient-to-r from-primary to-secondary shadow-xl hover:shadow-2xl transition-shadow duration-300"
+                <div
+                  className="bg-white p-2 rounded-lg border-4 border-gradient-to-r from-primary to-secondary shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-center"
                   style={{
-                    width: qrSize + 'px',
-                    height: qrSize + 'px',
+                    width: Number(qrSize) + 20 + "px",
+                    height: Number(qrSize) + 20 + "px",
                   }}
                 >
-                  <div className="w-full h-full bg-gradient-to-br from-primary to-secondary rounded opacity-80" />
+                  <img
+                    src={generatedQRUrl}
+                    alt="Generated QR Code"
+                    width={qrSize}
+                    height={qrSize}
+                    className="object-contain"
+                  />
                 </div>
               </div>
               <div className="flex gap-3 flex-col sm:flex-row w-full">
-                <Button 
+                <Button
                   variant="outline"
                   onClick={handleCopy}
                   className="flex-1 btn-smooth rounded-lg border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 h-10 sm:h-11 transition-all duration-300"
@@ -140,34 +301,42 @@ export default function QRGeneratorTab({
                   ) : (
                     <>
                       <Copy className="w-4 h-4 mr-2" />
-                      Copy
+                      Copy QR Image
                     </>
                   )}
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={handleDownload}
                   className="flex-1 btn-smooth rounded-lg border-2 border-secondary/30 hover:border-secondary/50 hover:bg-secondary/10 h-10 sm:h-11 transition-all duration-300"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  Download PNG
                 </Button>
               </div>
             </div>
           )}
 
-          <Button 
+          <Button
             onClick={handleGenerateQR}
+            disabled={loading}
             className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 py-4 sm:py-5 md:py-6 btn-smooth text-sm sm:text-base rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
             size="lg"
           >
-            <span className="flex items-center justify-center gap-2">
-              <Zap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-              Generate QR Code
-            </span>
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <Zap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                {generatedQRUrl ? "Regenerate QR Code" : "Generate QR Code"}
+              </span>
+            )}
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

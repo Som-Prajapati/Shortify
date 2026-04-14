@@ -2,13 +2,16 @@ import express from "express";
 import mongoose from "mongoose";
 import Shortner from "../models/shortner.js";
 import domain from "../models/domain.js";
+import ShortnerLookup from "../models/shortner-lookup.js";
 
 export const handleCreateShortner = async (req, res) => {
   try {
     const { domain, shortId, originalUrl } = req.body;
     const shortnerExists = await Shortner.findOne({ domain, shortId });
     if (shortnerExists)
-      return res.status(200).json({ message: "Not available" });
+      return res
+        .status(409)
+        .json({ message: "Short ID already taken for this domain" });
 
     await Shortner.create({
       user_id: req.user.id,
@@ -16,12 +19,20 @@ export const handleCreateShortner = async (req, res) => {
       shortId: shortId,
       original_url: originalUrl,
     });
-    return res.status(200).json({ message: "Shortner created Sucesdfully" });
+
+    // Populate the lookup collection used by the redirect handler
+    await ShortnerLookup.create({
+      domain: domain,
+      shortid: shortId,
+      original_url: originalUrl,
+    });
+
+    return res.status(201).json({ message: "Short URL created successfully" });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ message: "Internal server error in fetching domain list" });
+    res.status(500).json({
+      message: err.message || "Internal server error in creating short URL",
+    });
   }
 };
 
@@ -30,7 +41,6 @@ export const handleCheckAvailability = async (req, res) => {
     const { domain, shortId } = req.query;
 
     // From query params
-    console.log(domain, shortId);
     if (!domain || !shortId) {
       return res.status(400).json({ message: "Domain and shortid required" });
     }
@@ -48,52 +58,69 @@ export const handleCheckAvailability = async (req, res) => {
   }
 };
 
-export const handleGetAnalytics = async (req, res) => {
+export const handleGetAllShortners = async (req, res) => {
   try {
-    const shortner_id = req.params.id;
+    const user_id = req.user.id;
+    const shortners = await Shortner.find({ user_id }).sort({ created_at: -1 });
 
-    const shortner = await Shortner.findById({ _id: shortner_id });
-    if (!shortner)
-      return res.status(400).json({ message: "Shortner doesnt exits" });
-    const result = {
-      id: shortner_id,
-      domain: shortener.domain,
-      shortId: shortener.shortId,
-      clicks: shortener.clicks,
-    };
+    const result = shortners.map((s) => ({
+      id: s._id,
+      fullShortLink: `${s.domain}/${s.shortId}`,
+      originalUrl: s.original_url,
+      clicks: s.clicks,
+      isActive: s.is_active,
+      createdAt: s.created_at,
+    }));
 
     return res.status(200).json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error checking availability" });
+    res.status(500).json({ message: "Error fetching shortener list" });
   }
 };
 export const handleToggleIsActive = async (req, res) => {
   try {
     const { isActive } = req.body;
+    const user_id = req.user.id;
     const shortner_id = req.params.id;
-    const shortner = await Shortner.findById({ _id: shortner_id });
+    // Use findOne to ensure the user owns this shortener
+    const shortner = await Shortner.findOne({
+      _id: shortner_id,
+      user_id: user_id,
+    });
     if (!shortner)
-      return res.status(400).json({ message: "Shortner doesnt exits" });
+      return res.status(404).json({ message: "Shortner doesnt exist" });
     shortner.is_active = isActive;
     await shortner.save();
-    return res.status(400).json({ message: `Sucessfully ${isActive}` });
-    //TODO error if false remove from lookup
-    const shortener = await Shortner.findById({ _id: shortner_id });
-    console.log(shortner_id);
-    if (!shortener)
-      return res.status(400).json({ message: "Shortner doesnt exits" });
-    const result = {
-      id: shortner_id,
-      domain: shortener.domain,
-      shortId: shortener.shortId,
-      clicks: shortener.clicks,
-    };
 
-    return res.status(200).json(result);
+    if (isActive) {
+      // Re-add to lookup collection so redirects work again
+      // We use upsert/find first to avoid duplicate key errors just in case
+      await ShortnerLookup.updateOne(
+        { domain: shortner.domain, shortid: shortner.shortId },
+        {
+          $set: {
+            domain: shortner.domain,
+            shortid: shortner.shortId,
+            original_url: shortner.original_url,
+          },
+        },
+        { upsert: true },
+      );
+    } else {
+      // Remove from lookup collection so it stops redirecting instantly
+      await ShortnerLookup.deleteOne({
+        domain: shortner.domain,
+        shortid: shortner.shortId,
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: `Successfully toggled to ${isActive}` });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error checking availability" });
+    res.status(500).json({ message: "Error toggling shortener" });
   }
 };
 
@@ -105,11 +132,19 @@ export const handleDeleteShortner = async (req, res) => {
       _id: shortner_id,
       user_id: user_id,
     });
-    if (!shortner) res.status(400).json({ message: "Shortner not available" });
+    if (!shortner)
+      return res.status(404).json({ message: "Shortner not found" });
+
+    // Remember to delete from ShortnerLookup as well, otherwise redirects still work!
+    await ShortnerLookup.deleteOne({
+      domain: shortner.domain,
+      shortid: shortner.shortId,
+    });
     await Shortner.deleteOne({ _id: shortner_id });
-    res.status(400).json({ message: "Deleted Sucessfully" });
+
+    return res.status(200).json({ message: "Deleted successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error checking availability" });
+    res.status(500).json({ message: "Error deleting shortener" });
   }
 };

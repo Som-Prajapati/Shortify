@@ -17,16 +17,20 @@ const PORT = process.env.PORT || 3000;
 
 // global midddlewares
 app.use("/api", cors({ origin: process.env.ORIGIN, credentials: true }));
+// app.use("/api", cors({ origin: "*", credentials: true }));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+import qrcodeRoute from "../routes/qrcode.js";
 
 // route middlewares
 app.use("/api", userRoute);
 app.use("/api/domain", authMiddleware, domainRoute);
 app.use("/api/shortner", authMiddleware, shortnerRoute);
-// //TODO! work on below routes
-// app.use("/", redirectRoute);
+app.use("/api/qrcode", authMiddleware, qrcodeRoute);
+app.use("/", redirectRoute);
 
 // connect DB
 mongoConnector()

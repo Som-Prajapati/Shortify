@@ -51,12 +51,11 @@ export const handleLoginUser = async (req, res) => {
 
     const token = sign(payload);
 
-    //TODO cookie age is just 1hr for testng
     res.cookie("Token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 7 * 1000,
     });
 
     return res.status(200).json({

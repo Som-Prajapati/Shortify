@@ -40,7 +40,7 @@ const shortenerSchema = new mongoose.Schema(
 //instance for increment clicks
 
 // Indexes
-shortenerSchema.index({ domain: 1, shortid: 1 }, { unique: true });
+shortenerSchema.index({ domain: 1, shortId: 1 }, { unique: true });
 shortenerSchema.index({ user_id: 1 });
 
 export default mongoose.model("Shortener", shortenerSchema);

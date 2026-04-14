@@ -22,7 +22,7 @@ export default function Navbar({
       await handleLogout();
       onLogout?.(); // tells parent to update UI
     } catch (err) {
-      console.error("Logout failed");
+      console.log("Logout failed");
     }
   };
 
