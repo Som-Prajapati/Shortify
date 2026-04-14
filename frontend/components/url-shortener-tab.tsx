@@ -55,13 +55,14 @@ export default function URLShortenerTab({
           (d: { name: string }) => d.name,
         );
         // Fall back to localhost
-        const finalNames = names.length > 0 ? names : ["localhost:3001"];
+        const finalNames =
+          names.length > 0 ? names : [`${process.env.NEXT_PUBLIC_BACKEND_URL}`];
         setDomains(finalNames);
         setSelectedDomain(finalNames[0]);
       })
       .catch(() => {
-        setDomains(["localhost:3001"]);
-        setSelectedDomain("localhost:3001");
+        setDomains([`${process.env.NEXT_PUBLIC_BACKEND_URL}`]);
+        setSelectedDomain(`${process.env.NEXT_PUBLIC_BACKEND_URL}`);
       })
       .finally(() => setLoadingDomains(false));
   }, [isLoggedIn]);
