@@ -55,13 +55,14 @@ export default function URLShortenerTab({
           (d: { name: string }) => d.name,
         );
         // Fall back to localhost
-        const finalNames = names.length > 0 ? names : [];
+        const finalNames =
+          names.length > 0 ? names : [`${process.env.NEXT_PUBLIC_BACKEND_URL}`];
         setDomains(finalNames);
         setSelectedDomain(finalNames[0]);
       })
       .catch(() => {
-        setDomains([]);
-        setSelectedDomain(``);
+        setDomains([`${process.env.NEXT_PUBLIC_BACKEND_URL}`]);
+        setSelectedDomain(`${process.env.NEXT_PUBLIC_BACKEND_URL}`);
       })
       .finally(() => setLoadingDomains(false));
   }, [isLoggedIn]);

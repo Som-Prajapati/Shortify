@@ -5,7 +5,8 @@ export const handleRedirect = async (req, res) => {
   try {
     const { shortId } = req.params;
     // Use req.headers.host so "localhost:3001" matches what's stored in the DB
-    const domain = req.headers.host;
+    let domain = req.headers.host;
+    if (domain) domain = domain.replace(/^https?:\/\//i, "");
 
     // Fast lookup via the lookup collection
     const entry = await ShortnerLookup.findOne({ domain, shortid: shortId });

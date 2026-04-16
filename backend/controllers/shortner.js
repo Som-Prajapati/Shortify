@@ -7,7 +7,7 @@ import ShortnerLookup from "../models/shortner-lookup.js";
 export const handleCreateShortner = async (req, res) => {
   try {
     let { domain, shortId, originalUrl } = req.body;
-    if (domain) domain = domain.replace(/^https?:\/\//i, '');
+    if (domain) domain = domain.replace(/^https?:\/\//i, "");
     const shortnerExists = await Shortner.findOne({ domain, shortId });
     if (shortnerExists)
       return res
@@ -40,7 +40,7 @@ export const handleCreateShortner = async (req, res) => {
 export const handleCheckAvailability = async (req, res) => {
   try {
     let { domain, shortId } = req.query;
-    if (domain) domain = domain.replace(/^https?:\/\//i, '');
+    if (domain) domain = domain.replace(/^https?:\/\//i, "");
 
     // From query params
     if (!domain || !shortId) {
