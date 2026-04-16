@@ -31,8 +31,7 @@ const domainSchema = new mongoose.Schema(
 
 //static methods
 domainSchema.statics.getDomainList = async function (user_id) {
-  const array = await this.find({ user_id }).select("name -_id");
-  return array.map((item) => item.name);
+  return await this.find({ user_id }).select("name -_id");
 };
 
 //indexes

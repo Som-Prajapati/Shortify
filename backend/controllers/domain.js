@@ -24,7 +24,8 @@ export const handleFetchDomains = async (req, res) => {
 
 export const handleStoreDomains = async (req, res) => {
   try {
-    const { domain } = req.body;
+    let { domain } = req.body;
+    if (domain) domain = domain.replace(/^https?:\/\//i, '');
     const domianExists = await Domain.findOne({ name: domain });
 
     if (domianExists) return res.json({ message: "domain already exits" });
