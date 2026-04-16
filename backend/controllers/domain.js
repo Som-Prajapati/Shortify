@@ -9,9 +9,21 @@ export const handleFetchDomains = async (req, res) => {
     const userDomain = await Domain.getDomainList(user_id);
 
     const admin = await User.findUserByEmail(process.env.ADMIN_EMAIL);
-    const adminDomain = admin ? await Domain.getDomainList(admin._id) : [];
+    // Skip fetching admin domains separately if the current user IS the admin
+    const adminDomain =
+      admin && admin._id.toString() !== user_id.toString()
+        ? await Domain.getDomainList(admin._id)
+        : [];
 
-    const result = { domainList: [...userDomain, ...adminDomain] };
+    // Deduplicate by name (safety net)
+    const seen = new Set();
+    const merged = [...userDomain, ...adminDomain].filter((d) => {
+      if (seen.has(d.name)) return false;
+      seen.add(d.name);
+      return true;
+    });
+
+    const result = { domainList: merged };
 
     return res.status(200).json(result);
   } catch (err) {
