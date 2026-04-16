@@ -26,7 +26,7 @@ export const handleStoreDomains = async (req, res) => {
   try {
     const { domain } = req.body;
     const domianExists = await Domain.findOne({ name: domain });
-    console.log(domianExists);
+
     if (domianExists) return res.json({ message: "domain already exits" });
 
     Domain.create({
