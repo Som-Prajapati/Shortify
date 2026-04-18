@@ -65,9 +65,17 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
       }
     };
 
+    const handleQrCreated = () => {
+      if (activeTab === "qr") {
+        loadData();
+      }
+    };
+
     window.addEventListener("shortenerCreated", handleShortenerCreated);
+    window.addEventListener("qrCreated", handleQrCreated);
     return () => {
       window.removeEventListener("shortenerCreated", handleShortenerCreated);
+      window.removeEventListener("qrCreated", handleQrCreated);
     };
   }, [activeTab]);
 

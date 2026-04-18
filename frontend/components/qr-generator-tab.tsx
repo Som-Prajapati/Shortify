@@ -74,6 +74,9 @@ export default function QRGeneratorTab({
 
       setGeneratedQRUrl(qrDataUrl);
       toast.success("QR Code Generated & Saved Successfully!");
+
+      // Notify user-history to refresh its QR list
+      window.dispatchEvent(new Event("qrCreated"));
     } catch (error: any) {
       console.error(error);
       if (error.response?.status === 409) {
