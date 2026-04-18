@@ -89,6 +89,21 @@ export const handleRegisterUser = async (req, res) => {
     await user.setPassword(password);
     await user.save();
 
+    // Auto-login: sign a JWT and set the cookie so the user is fully
+    // authenticated immediately after sign-up (same as the login flow).
+    const payload = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    };
+    const token = sign(payload);
+    res.cookie("Token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 7 * 1000,
+    });
+
     return res.status(201).json({
       message: "User registered successfully",
       user: {
