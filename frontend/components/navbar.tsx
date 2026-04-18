@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/theme-toggle";
 import { handleLogout } from "@/services/auth";
@@ -28,12 +29,25 @@ export default function Navbar({
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-7 sm:w-8 h-7 sm:h-8 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs sm:text-sm">
-            S
-          </div>
+          <>
+            <Image
+              src="/shortifylogo.png"
+              alt="Shortify Logo"
+              width={60}
+              height={60}
+              className="w-12 sm:w-12 h-12 sm:h-12 rounded object-contain dark:hidden"
+            />
+            <Image
+              src="/shortifylogo-dark.png"
+              alt="Shortify Logo"
+              width={60}
+              height={60}
+              className="w-12 sm:w-12 h-12 sm:h-12 rounded object-contain hidden dark:block"
+            />
+          </>
           <span className="font-bold text-sm sm:text-base md:text-lg hidden sm:inline">
             Shortify
           </span>

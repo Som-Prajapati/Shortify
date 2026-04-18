@@ -344,7 +344,7 @@ export default function URLShortenerTab({
               <Button
                 onClick={() => onAddDomain()}
                 variant="outline"
-                className="w-full btn-smooth text-xs sm:text-sm h-10 sm:h-11 rounded-lg border-2 border-border/50 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300"
+                className="w-full btn-smooth text-xs sm:text-sm h-10 sm:h-11 rounded-lg border-2 border-border/50 hover:border-secondary/50 hover:bg-secondary/5 hover:text-foreground transition-all duration-300"
               >
                 + Add Custom Domain
               </Button>
