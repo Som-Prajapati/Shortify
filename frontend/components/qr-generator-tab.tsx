@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ColorSelector } from "@/components/color-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, Download, QrCode, Zap, Loader2 } from "lucide-react";
@@ -27,6 +28,7 @@ export default function QRGeneratorTab({
   const [qrInput, setQrInput] = useState("");
   const [qrType, setQrType] = useState("url");
   const [qrSize, setQrSize] = useState("250");
+  const [qrColor, setQrColor] = useState("#000000");
   const [generatedQRUrl, setGeneratedQRUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -59,6 +61,7 @@ export default function QRGeneratorTab({
         type: qrType,
         size: Number(qrSize),
         content: formattedContent,
+        color: qrColor,
       });
 
       // Generate QR Code image base64 locally
@@ -67,7 +70,7 @@ export default function QRGeneratorTab({
         margin: 2,
         errorCorrectionLevel: "H",
         color: {
-          dark: "#000000",
+          dark: qrColor,
           light: "#ffffff",
         },
       });
@@ -84,6 +87,10 @@ export default function QRGeneratorTab({
         const qrDataUrl = await QRCode.toDataURL(formattedContent, {
           width: Number(qrSize),
           margin: 2,
+          color: {
+            dark: qrColor,
+            light: "#ffffff",
+          },
         });
         setGeneratedQRUrl(qrDataUrl);
         toast.info(
@@ -145,7 +152,7 @@ export default function QRGeneratorTab({
         </div>
 
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
                 Content Type
@@ -231,6 +238,19 @@ export default function QRGeneratorTab({
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
+                QR Color
+              </label>
+              <ColorSelector
+                value={qrColor}
+                onChange={(color) => {
+                  setQrColor(color);
+                  setGeneratedQRUrl("");
+                }}
+              />
+            </div>
           </div>
 
           <div className="group">
@@ -294,7 +314,7 @@ export default function QRGeneratorTab({
                 <Button
                   variant="outline"
                   onClick={handleCopy}
-                  className="flex-1 btn-smooth rounded-lg border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 h-10 sm:h-11 transition-all duration-300"
+                  className="flex-1 btn-smooth rounded-lg border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 hover:text-foreground h-10 sm:h-11 transition-all duration-300"
                 >
                   {copied ? (
                     <>
@@ -311,7 +331,7 @@ export default function QRGeneratorTab({
                 <Button
                   variant="outline"
                   onClick={handleDownload}
-                  className="flex-1 btn-smooth rounded-lg border-2 border-secondary/30 hover:border-secondary/50 hover:bg-secondary/10 h-10 sm:h-11 transition-all duration-300"
+                  className="flex-1 btn-smooth rounded-lg border-2 border-secondary/30 hover:border-secondary/50 hover:bg-secondary/10 hover:text-foreground  h-10 sm:h-11 transition-all duration-300"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download PNG
@@ -323,7 +343,7 @@ export default function QRGeneratorTab({
           <Button
             onClick={handleGenerateQR}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 py-4 sm:py-5 md:py-6 btn-smooth text-sm sm:text-base rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
+            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90  hover:border-foreground/50 hover:to-secondary/90 py-4 sm:py-5 md:py-6 btn-smooth text-sm sm:text-base rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
             size="lg"
           >
             {loading ? (

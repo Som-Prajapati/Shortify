@@ -24,6 +24,11 @@ const qrcodeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    color: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
   {
     timestamps: { createdAt: "created_at" },
@@ -32,6 +37,9 @@ const qrcodeSchema = new mongoose.Schema(
 
 //instance for increment clicks
 qrcodeSchema.index({ user_id: 1 });
-qrcodeSchema.index({ user_id: 1, content: 1, size: 1 }, { unique: true });
+qrcodeSchema.index(
+  { user_id: 1, content: 1, size: 1, color: 1 },
+  { unique: true },
+);
 
 export default mongoose.model("Qrcode", qrcodeSchema);

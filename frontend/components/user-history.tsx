@@ -30,6 +30,7 @@ interface QRCodeDoc {
   type: string;
   size: number;
   content: string;
+  color?: string;
   createdAt: string;
 }
 
@@ -121,13 +122,13 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
     }
   };
 
-  const handleCopyQR = async (content: string, size: number) => {
+  const handleCopyQR = async (content: string, size: number, color?: string) => {
     try {
       const qrDataUrl = await QRCode.toDataURL(content, {
         width: size,
         margin: 2,
         errorCorrectionLevel: "H",
-        color: { dark: "#000000", light: "#ffffff" },
+        color: { dark: color || "#000000", light: "#ffffff" },
       });
       const response = await fetch(qrDataUrl);
       const blob = await response.blob();
@@ -141,13 +142,13 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
     }
   };
 
-  const handleViewQR = async (content: string, size: number) => {
+  const handleViewQR = async (content: string, size: number, color?: string) => {
     try {
       const qrDataUrl = await QRCode.toDataURL(content, {
         width: size,
         margin: 2,
         errorCorrectionLevel: "H",
-        color: { dark: "#000000", light: "#ffffff" },
+        color: { dark: color || "#000000", light: "#ffffff" },
       });
       // Simple way to preview
       const newTab = window.open();
@@ -273,10 +274,10 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => handleViewQR(item.content, item.size)} title="Preview QR Image">
+                  <Button variant="outline" size="sm" onClick={() => handleViewQR(item.content, item.size, item.color)} title="Preview QR Image">
                     <Eye className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleCopyQR(item.content, item.size)} title="Copy QR Image to Clipboard">
+                  <Button variant="outline" size="sm" onClick={() => handleCopyQR(item.content, item.size, item.color)} title="Copy QR Image to Clipboard">
                     <Copy className="w-4 h-4" />
                   </Button>
                   <Button

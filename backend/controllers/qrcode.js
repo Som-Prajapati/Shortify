@@ -4,10 +4,10 @@ import Qrcode from "../models/qrcodes.js";
 
 export const handleCreateQrcode = async (req, res) => {
   try {
-    const { type, size, content } = req.body;
+    const { type, size, content, color } = req.body;
     const user_id = req.user.id;
 
-    const qrcodeExists = await Qrcode.findOne({ user_id, type, size, content });
+    const qrcodeExists = await Qrcode.findOne({ user_id, type, size, content, color });
     if (qrcodeExists)
       return res.status(200).json({ message: "Qrcode already exists" });
 
@@ -16,6 +16,7 @@ export const handleCreateQrcode = async (req, res) => {
       type,
       size,
       content,
+      color,
     });
     return res.status(201).json({ message: "Qrcode created successfully" });
   } catch (err) {
@@ -46,6 +47,7 @@ export const handleGetAllQrcodes = async (req, res) => {
       type: qrcode.type,
       size: qrcode.size,
       content: qrcode.content,
+      color: qrcode.color,
       createdAt: qrcode.created_at,
     }));
     return res.status(200).json(formattedQrcodes);
