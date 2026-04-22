@@ -1,16 +1,15 @@
+// components/navbar.tsx
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/theme-toggle";
-import { handleLogout } from "@/services/auth";
 
 interface NavbarProps {
   onAuthClick: (mode: "login" | "signup") => void;
   isLoggedIn: boolean;
-  onLogout?: () => void;
+  onLogout?: () => Promise<void>;
 }
 
 export default function Navbar({
@@ -18,13 +17,8 @@ export default function Navbar({
   isLoggedIn,
   onLogout,
 }: NavbarProps) {
-  const logoutUser = async () => {
-    try {
-      await handleLogout();
-      onLogout?.(); // tells parent to update UI
-    } catch (err) {
-      console.log("Logout failed");
-    }
+  const handleLogout = async () => {
+    await onLogout?.();
   };
 
   return (
@@ -99,16 +93,14 @@ export default function Navbar({
               </Button>
             </>
           ) : (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={logoutUser}
-                className="btn-smooth text-sm"
-              >
-                Logout
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="btn-smooth text-sm"
+            >
+              Logout
+            </Button>
           )}
         </div>
 
@@ -136,16 +128,14 @@ export default function Navbar({
               </Button>
             </>
           ) : (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs px-2"
-                onClick={logoutUser}
-              >
-                Logout
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs px-2"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
           )}
         </div>
       </div>

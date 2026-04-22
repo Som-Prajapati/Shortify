@@ -1,6 +1,8 @@
+// app/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/navbar";
 import AuthModal from "@/components/auth-modal";
 import Hero from "@/components/hero";
@@ -9,28 +11,11 @@ import OneStopSolution from "@/components/one-stop-solution";
 import Features from "@/components/features";
 import FAQ from "@/components/faq";
 import Footer from "@/components/footer";
-import api from "@/lib/api";
 
 export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      await api.get("/auth/check");
-      setIsLoggedIn(true);
-    } catch (err) {
-      setIsLoggedIn(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { isLoggedIn, loading, logout } = useAuth();
 
   const handleAuthClick = (mode: "login" | "signup") => {
     setAuthMode(mode);
@@ -50,7 +35,7 @@ export default function Home() {
       <Navbar
         onAuthClick={handleAuthClick}
         isLoggedIn={isLoggedIn}
-        onLogout={() => setIsLoggedIn(false)}
+        onLogout={logout}
       />
 
       <AuthModal
@@ -59,8 +44,8 @@ export default function Home() {
         mode={authMode}
         onModeChange={setAuthMode}
         onSuccess={() => {
-          setIsLoggedIn(true);
           setIsAuthOpen(false);
+          // Auth hook will auto-detect session change and update isLoggedIn
         }}
       />
       <main>

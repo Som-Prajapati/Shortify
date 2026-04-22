@@ -15,7 +15,11 @@ const userSchema = mongoose.Schema({
     unique: true,
     lowercase: true,
   },
-  password: { type: String, required: true },
+  // password is optional for Google OAuth users
+  password: { type: String, required: false },
+  // Google OAuth identifier
+  googleId: { type: String, default: null },
+  avatar: { type: String, default: null },
   createdAt: {
     type: Date,
     default: Date.now,

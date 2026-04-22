@@ -1,13 +1,67 @@
 import User from "../models/user.js";
 import { sign } from "../services/auth.js";
 
+// ─── Google OAuth ──────────────────────────────────────────────────────────────
+/**
+ * POST /api/auth/google
+ * Called by NextAuth's signIn callback after a successful Google OAuth flow.
+ * Finds or creates the user, then issues the same JWT cookie used everywhere.
+ */
+export const handleGoogleAuth = async (req, res) => {
+  try {
+    const { email, name, googleId, avatar } = req.body;
+
+    if (!email || !googleId) {
+      return res.status(400).json({ message: "Missing Google profile data" });
+    }
+
+    // Find an existing user by email (covers both regular + Google users)
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Existing user: link googleId / avatar if not already set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = avatar ?? user.avatar;
+        await user.save();
+      }
+    } else {
+      // New user via Google — no password needed
+      user = new User({ name, email, googleId, avatar });
+      await user.save();
+    }
+
+    const payload = { id: user._id, name: user.name, email: user.email };
+    const token = sign(payload);
+
+    res.cookie("Token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 7 * 1000, // 7 days
+    });
+
+    return res.status(200).json({
+      message: "Google auth successful",
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    console.error("Google auth error:", err);
+    return res.status(500).json({ message: "Internal server error during Google auth" });
+  }
+};
+
 export const handleGetCurrentUser = async (req, res) => {
   try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     return res.status(200).json({
       user: {
-        id: req.user.id,
-        email: req.user.email,
-        name: req.user.name,
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar ?? null,
       },
     });
   } catch (err) {
@@ -23,7 +77,7 @@ export const handleLogoutUser = async (req, res) => {
     res.clearCookie("Token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
     return res.status(200).json({ message: "Logged out Sucessfully" });
   } catch (err) {

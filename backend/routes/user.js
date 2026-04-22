@@ -4,6 +4,7 @@ import {
   handleLoginUser,
   handleLogoutUser,
   handleGetCurrentUser,
+  handleGoogleAuth,
 } from "../controllers/user.js";
 import {
   registerValidationRules,
@@ -23,8 +24,12 @@ router.post(
 
 router.post("/auth/login", loginValidationRules(), validate, handleLoginUser);
 
+// Google OAuth — called by NextAuth's signIn callback
+router.post("/auth/google", handleGoogleAuth);
+
 router.get("/auth/logout", handleLogoutUser);
 
 router.get("/auth/check", authMiddleware, handleGetCurrentUser);
 
 export default router;
+
