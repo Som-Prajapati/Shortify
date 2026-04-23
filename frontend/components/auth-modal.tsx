@@ -12,7 +12,7 @@ interface AuthModalProps {
   onClose: () => void;
   mode: "login" | "signup";
   onModeChange: (mode: "login" | "signup") => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 
 // Google logo SVG (official brand colors)
@@ -63,7 +63,7 @@ export default function AuthModal({
   // If user just came back from Google OAuth redirect and we have a session, signal success
   useEffect(() => {
     if (session?.user && isOpen) {
-      onSuccess();
+      void onSuccess();
     }
   }, [session, isOpen, onSuccess]);
 
@@ -117,7 +117,7 @@ export default function AuthModal({
         await handleLogin(email, password);
       }
 
-      onSuccess();
+      await onSuccess();
       setEmail("");
       setPassword("");
       setRetypePassword("");

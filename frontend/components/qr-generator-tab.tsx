@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ColorSelector } from "@/components/color-selector";
+import { IconPicker } from "@/components/icon-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Copy, Download, QrCode, Zap, Loader2 } from "lucide-react";
@@ -12,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import QRCode from "qrcode";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { generateQRImage } from "@/lib/qr-generator";
 
 interface QRGeneratorTabProps {
   isLoggedIn: boolean;
@@ -29,9 +30,12 @@ export default function QRGeneratorTab({
   const [qrType, setQrType] = useState("url");
   const [qrSize, setQrSize] = useState("250");
   const [qrColor, setQrColor] = useState("#000000");
+  const [logoType, setLogoType] = useState<"none" | "emoji" | "image">("none");
+  const [logoValue, setLogoValue] = useState("");
   const [generatedQRUrl, setGeneratedQRUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
 
   const handleGenerateQR = async () => {
     if (!isLoggedIn) {
@@ -62,17 +66,17 @@ export default function QRGeneratorTab({
         size: Number(qrSize),
         content: formattedContent,
         color: qrColor,
+        logoType,
+        logoValue,
       });
 
       // Generate QR Code image base64 locally
-      const qrDataUrl = await QRCode.toDataURL(formattedContent, {
-        width: Number(qrSize),
-        margin: 2,
-        errorCorrectionLevel: "H",
-        color: {
-          dark: qrColor,
-          light: "#ffffff",
-        },
+      const qrDataUrl = await generateQRImage({
+        text: formattedContent,
+        qrSize,
+        qrColor,
+        logoType,
+        logoValue,
       });
 
       setGeneratedQRUrl(qrDataUrl);
@@ -84,13 +88,12 @@ export default function QRGeneratorTab({
       console.error(error);
       if (error.response?.status === 409) {
         // Even if it already exists, display the QR code
-        const qrDataUrl = await QRCode.toDataURL(formattedContent, {
-          width: Number(qrSize),
-          margin: 2,
-          color: {
-            dark: qrColor,
-            light: "#ffffff",
-          },
+        const qrDataUrl = await generateQRImage({
+          text: formattedContent,
+          qrSize,
+          qrColor,
+          logoType,
+          logoValue,
         });
         setGeneratedQRUrl(qrDataUrl);
         toast.info(
@@ -152,7 +155,7 @@ export default function QRGeneratorTab({
         </div>
 
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
                 Content Type
@@ -249,6 +252,24 @@ export default function QRGeneratorTab({
                   setQrColor(color);
                   setGeneratedQRUrl("");
                 }}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
+                Center Style
+              </label>
+              <IconPicker
+                value={{
+                  type: logoType === "image" ? "logo" : logoType,
+                  value: logoValue,
+                }}
+                onChange={(val) => {
+                  setLogoType(val.type === "logo" ? "image" : val.type);
+                  setLogoValue(val.value || "");
+                  setGeneratedQRUrl("");
+                }}
+                className="h-11 sm:h-10 [&>button]:h-full"
               />
             </div>
           </div>

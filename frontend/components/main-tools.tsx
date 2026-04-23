@@ -13,11 +13,17 @@ import DomainModal from "@/components/domain-modal";
 interface MainToolsProps {
   isLoggedIn: boolean;
   onLoginRequired: () => void;
+  qrRefreshKey: number;
+  domains: string[];
+  loadingDomains: boolean;
 }
 
 export default function MainTools({
   isLoggedIn,
   onLoginRequired,
+  qrRefreshKey,
+  domains,
+  loadingDomains,
 }: MainToolsProps) {
   const [activeTab, setActiveTab] = useState("url");
   const [isDomainModalOpen, setIsDomainModalOpen] = useState(false);
@@ -36,11 +42,14 @@ export default function MainTools({
               isLoggedIn={isLoggedIn}
               onLoginRequired={onLoginRequired}
               onAddDomain={() => setIsDomainModalOpen(true)}
+              domains={domains}
+              loadingDomains={loadingDomains}
             />
           </TabsContent>
 
           <TabsContent value="qr">
             <QRGeneratorTab
+              key={qrRefreshKey}
               isLoggedIn={isLoggedIn}
               onLoginRequired={onLoginRequired}
             />

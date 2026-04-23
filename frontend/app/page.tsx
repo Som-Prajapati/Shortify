@@ -11,11 +11,44 @@ import OneStopSolution from "@/components/one-stop-solution";
 import Features from "@/components/features";
 import FAQ from "@/components/faq";
 import Footer from "@/components/footer";
+import { fetchDomains } from "@/services/shortner";
+import { useEffect } from "react";
 
 export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const { isLoggedIn, loading, logout } = useAuth();
+  const [qrRefreshKey, setQrRefreshKey] = useState(0);
+  const [domains, setDomains] = useState<string[]>([]);
+  const [loadingDomains, setLoadingDomains] = useState(false);
+  const { isLoggedIn, loading, logout, refreshAuth } = useAuth();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setDomains([]);
+      setLoadingDomains(false);
+      return;
+    }
+
+    setLoadingDomains(true);
+    fetchDomains()
+      .then((data) => {
+        const names: string[] = (data?.domainList ?? []).map(
+          (d: { name: string }) => d.name,
+        );
+        setDomains(names);
+      })
+      .catch(() => {
+        setDomains([]);
+      })
+      .finally(() => {
+        setLoadingDomains(false);
+      });
+  }, [isLoggedIn]);
+  const handleLogout = async () => {
+    await logout();
+    setQrRefreshKey((prev) => prev + 1);
+  };
+
 
   const handleAuthClick = (mode: "login" | "signup") => {
     setAuthMode(mode);
@@ -35,7 +68,7 @@ export default function Home() {
       <Navbar
         onAuthClick={handleAuthClick}
         isLoggedIn={isLoggedIn}
-        onLogout={logout}
+        onLogout={handleLogout}
       />
 
       <AuthModal
@@ -43,15 +76,18 @@ export default function Home() {
         onClose={() => setIsAuthOpen(false)}
         mode={authMode}
         onModeChange={setAuthMode}
-        onSuccess={() => {
+        onSuccess={async () => {
           setIsAuthOpen(false);
-          // Auth hook will auto-detect session change and update isLoggedIn
+          await refreshAuth();
         }}
       />
       <main>
         <MainTools
           isLoggedIn={isLoggedIn}
           onLoginRequired={() => handleAuthClick("signup")}
+          qrRefreshKey={qrRefreshKey}
+          domains={domains}
+          loadingDomains={loadingDomains}
         />
         <Hero onGetStarted={() => handleAuthClick("signup")} />
         <OneStopSolution />

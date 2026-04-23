@@ -29,6 +29,14 @@ const qrcodeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    logoType: {
+      type: String,
+      enum: ["none", "emoji", "image"],
+      default: "none",
+    },
+    logoValue: {
+      type: String,
+    },
   },
   {
     timestamps: { createdAt: "created_at" },
@@ -38,7 +46,7 @@ const qrcodeSchema = new mongoose.Schema(
 //instance for increment clicks
 qrcodeSchema.index({ user_id: 1 });
 qrcodeSchema.index(
-  { user_id: 1, content: 1, size: 1, color: 1 },
+  { user_id: 1, content: 1, size: 1, color: 1, logoType: 1, logoValue: 1 },
   { unique: true },
 );
 

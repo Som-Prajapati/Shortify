@@ -9,20 +9,7 @@ export function useAuth() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // On mount: check if user has valid backend session
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  // When NextAuth session changes AND we're not already logged in,
-  // sync to backend (handles Google OAuth flow)
-  useEffect(() => {
-    if (status === "authenticated" && session?.user && !isLoggedIn) {
-      syncSessionToBackend();
-    }
-  }, [status, session?.user?.email]); // Use email as stable key
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       await api.get("/auth/check");
       setIsLoggedIn(true);
@@ -31,7 +18,20 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // On mount: check if user has valid backend session
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  // When NextAuth session changes AND we're not already logged in,
+  // sync to backend (handles Google OAuth flow)
+  useEffect(() => {
+    if (status === "authenticated" && session?.user && !isLoggedIn) {
+      syncSessionToBackend();
+    }
+  }, [status, session?.user?.email]); // Use email as stable key
 
   const syncSessionToBackend = async () => {
     try {
@@ -74,5 +74,6 @@ export function useAuth() {
     session,
     logout,
     status,
+    refreshAuth: checkAuth,
   };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,26 +23,26 @@ import {
 import {
   createShortUrl,
   checkAvailability,
-  fetchDomains,
 } from "@/services/shortner";
 
 interface URLShortenerTabProps {
   isLoggedIn: boolean;
   onLoginRequired: () => void;
   onAddDomain: () => void;
+  domains: string[];
+  loadingDomains: boolean;
 }
 
 export default function URLShortenerTab({
   isLoggedIn,
   onLoginRequired,
   onAddDomain,
+  domains,
+  loadingDomains,
 }: URLShortenerTabProps) {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customShortId, setCustomShortId] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("");
-  const [domains, setDomains] = useState<string[]>([]);
-  const [loadingDomains, setLoadingDomains] = useState(false);
-
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -54,28 +54,17 @@ export default function URLShortenerTab({
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [toastCopied, setToastCopied] = useState(false);
 
-  // Fetch domains from the API when the user is logged in
+  // Keep domain selection valid when shared domain list changes
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || domains.length === 0) {
+      setSelectedDomain("");
+      return;
+    }
 
-    // Fetch domains
-    setLoadingDomains(true);
-    fetchDomains()
-      .then((data) => {
-        const names: string[] = (data.domainList ?? []).map(
-          (d: { name: string }) => d.name,
-        );
-        // Fall back to localhost
-        const finalNames = names.length > 0 ? names : [];
-        setDomains(finalNames);
-        setSelectedDomain(finalNames[0]);
-      })
-      .catch(() => {
-        setDomains([]);
-        setSelectedDomain("");
-      })
-      .finally(() => setLoadingDomains(false));
-  }, [isLoggedIn]);
+    if (!domains.includes(selectedDomain)) {
+      setSelectedDomain(domains[0]);
+    }
+  }, [isLoggedIn, domains, selectedDomain]);
 
   // Real availability check — debounced 500 ms
   useEffect(() => {
