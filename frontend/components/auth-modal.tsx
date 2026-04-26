@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { handleRegister, handleLogin } from "@/services/auth";
+import { handleRegister } from "@/services/auth";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -114,7 +114,16 @@ export default function AuthModal({
       if (mode === "signup") {
         await handleRegister(email, password, name);
       } else {
-        await handleLogin(email, password);
+        const response = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (!response || response.error) {
+          setError("Invalid email or password");
+          return;
+        }
       }
 
       await onSuccess();

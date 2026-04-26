@@ -19,12 +19,11 @@ router.post(
   "/auth/register",
   registerValidationRules(),
   validate,
-  handleRegisterUser
+  handleRegisterUser,
 );
 
 router.post("/auth/login", loginValidationRules(), validate, handleLoginUser);
 
-// Google OAuth — called by NextAuth's signIn callback
 router.post("/auth/google", handleGoogleAuth);
 
 router.get("/auth/logout", handleLogoutUser);
@@ -32,4 +31,3 @@ router.get("/auth/logout", handleLogoutUser);
 router.get("/auth/check", authMiddleware, handleGetCurrentUser);
 
 export default router;
-

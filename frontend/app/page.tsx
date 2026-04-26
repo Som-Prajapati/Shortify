@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/navbar";
 import AuthModal from "@/components/auth-modal";
 import Hero from "@/components/hero";
@@ -13,6 +12,7 @@ import FAQ from "@/components/faq";
 import Footer from "@/components/footer";
 import { fetchDomains } from "@/services/shortner";
 import { useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -20,7 +20,9 @@ export default function Home() {
   const [qrRefreshKey, setQrRefreshKey] = useState(0);
   const [domains, setDomains] = useState<string[]>([]);
   const [loadingDomains, setLoadingDomains] = useState(false);
-  const { isLoggedIn, loading, logout, refreshAuth } = useAuth();
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  const loading = status === "loading";
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -45,7 +47,7 @@ export default function Home() {
       });
   }, [isLoggedIn]);
   const handleLogout = async () => {
-    await logout();
+    await signOut({ redirect: false });
     setQrRefreshKey((prev) => prev + 1);
   };
 
@@ -78,7 +80,6 @@ export default function Home() {
         onModeChange={setAuthMode}
         onSuccess={async () => {
           setIsAuthOpen(false);
-          await refreshAuth();
         }}
       />
       <main>

@@ -1,20 +1,20 @@
 import api from "@/lib/api";
+import { signIn } from "next-auth/react";
 
 export const handleRegister = async (email, password, name) => {
-  const response = await api.post("/auth/register", {
+  await api.post("/auth/register", {
     name,
     email,
     password,
   });
-  console.log(response.data);
-};
 
-export const handleLogin = async (email, password) => {
-  const response = await api.post("/auth/login", { email, password });
-  console.log(response.data);
-};
+  const loginResult = await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  });
 
-export const handleLogout = async () => {
-  const response = await api.get("/auth/logout");
-  console.log(response.data);
+  if (!loginResult || loginResult.error) {
+    throw new Error("Registered, but automatic login failed.");
+  }
 };

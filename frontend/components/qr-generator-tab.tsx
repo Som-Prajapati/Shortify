@@ -36,7 +36,6 @@ export default function QRGeneratorTab({
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-
   const handleGenerateQR = async () => {
     if (!isLoggedIn) {
       onLoginRequired();
@@ -155,7 +154,7 @@ export default function QRGeneratorTab({
         </div>
 
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex flex-wrap justify-center items-center gap-12 text-center">
             <div>
               <label className="text-xs sm:text-sm font-semibold block mb-3 text-foreground/80">
                 Content Type

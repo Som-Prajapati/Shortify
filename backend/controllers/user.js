@@ -1,12 +1,6 @@
 import User from "../models/user.js";
 import { sign } from "../services/auth.js";
 
-// ─── Google OAuth ──────────────────────────────────────────────────────────────
-/**
- * POST /api/auth/google
- * Called by NextAuth's signIn callback after a successful Google OAuth flow.
- * Finds or creates the user, then issues the same JWT cookie used everywhere.
- */
 export const handleGoogleAuth = async (req, res) => {
   try {
     const { email, name, googleId, avatar } = req.body;
@@ -14,19 +8,15 @@ export const handleGoogleAuth = async (req, res) => {
     if (!email || !googleId) {
       return res.status(400).json({ message: "Missing Google profile data" });
     }
-
-    // Find an existing user by email (covers both regular + Google users)
     let user = await User.findOne({ email });
 
     if (user) {
-      // Existing user: link googleId / avatar if not already set
       if (!user.googleId) {
         user.googleId = googleId;
         user.avatar = avatar ?? user.avatar;
         await user.save();
       }
     } else {
-      // New user via Google — no password needed
       user = new User({ name, email, googleId, avatar });
       await user.save();
     }
@@ -34,25 +24,25 @@ export const handleGoogleAuth = async (req, res) => {
     const payload = { id: user._id, name: user.name, email: user.email };
     const token = sign(payload);
 
-    res.cookie("Token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 7 * 1000, // 7 days
-    });
-
     return res.status(200).json({
       message: "Google auth successful",
       user: { id: user._id, name: user.name, email: user.email },
+      token,
     });
   } catch (err) {
     console.error("Google auth error:", err);
-    return res.status(500).json({ message: "Internal server error during Google auth" });
+    return res
+      .status(500)
+      .json({ message: "Internal server error during Google auth" });
   }
 };
 
 export const handleGetCurrentUser = async (req, res) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -65,13 +55,19 @@ export const handleGetCurrentUser = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(401).json({ message: "Not authenticated" });
+    console.error("Get current user error:", err);
+    res.status(500).json({ message: "Internal server error while fetching user" });
   }
 };
 
 export const handleLogoutUser = async (req, res) => {
   try {
-    const token = req.cookies?.Token;
+    const authHeader = req.headers?.authorization || "";
+    const tokenFromHeader = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : null;
+    const token = tokenFromHeader ?? req.cookies?.Token;
+
     if (!token) return res.status(200).json({ message: "Already Logged out" });
 
     res.clearCookie("Token", {
@@ -105,13 +101,6 @@ export const handleLoginUser = async (req, res) => {
 
     const token = sign(payload);
 
-    res.cookie("Token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 7 * 1000,
-    });
-
     return res.status(200).json({
       message: "User login successful",
       user: {
@@ -119,6 +108,7 @@ export const handleLoginUser = async (req, res) => {
         name: user.name,
         email: user.email,
       },
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -143,20 +133,12 @@ export const handleRegisterUser = async (req, res) => {
     await user.setPassword(password);
     await user.save();
 
-    // Auto-login: sign a JWT and set the cookie so the user is fully
-    // authenticated immediately after sign-up (same as the login flow).
     const payload = {
       id: user._id,
       name: user.name,
       email: user.email,
     };
     const token = sign(payload);
-    res.cookie("Token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 7 * 1000,
-    });
 
     return res.status(201).json({
       message: "User registered successfully",
@@ -164,8 +146,8 @@ export const handleRegisterUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        created_at: user.created_at,
       },
+      token,
     });
   } catch (err) {
     console.error(err);
