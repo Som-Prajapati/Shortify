@@ -30,6 +30,8 @@ app.use("/api", userRoute);
 app.use("/api/domain", authMiddleware, domainRoute);
 app.use("/api/shortner", authMiddleware, shortnerRoute);
 app.use("/api/qrcode", authMiddleware, qrcodeRoute);
+// app.use("/api/qrcode", qrcodeRoute);
+//
 app.use("/", redirectRoute);
 
 // connect DB

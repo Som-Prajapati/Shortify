@@ -8,9 +8,9 @@ import {
   toggleShortenerActive,
   deleteShortener,
 } from "@/services/shortner";
-import api from "@/lib/api";
 import { toast } from "sonner";
 import QRCode from "qrcode";
+import { fetchQRCodes, deleteQRCode } from "@/services/qrcode";
 
 interface UserHistoryProps {
   activeTab: string;
@@ -46,8 +46,8 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
         const data = await fetchShortenersList();
         setUrlHistory(data || []);
       } else if (activeTab === "qr") {
-        const response = await api.get("/qrcode/all");
-        setQrHistory(response.data || []);
+        const data = await fetchQRCodes();
+        setQrHistory(data || []);
       }
     } catch (err) {
       console.log("Failed to load history");
@@ -114,7 +114,7 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
       return;
     try {
       setQrHistory((prev) => prev.filter((q) => q.id !== id));
-      await api.delete(`/qrcode/${id}`);
+      await deleteQRCode(id);
       toast.success("QR Code deleted successfully");
     } catch (err) {
       loadData();
@@ -122,7 +122,11 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
     }
   };
 
-  const handleCopyQR = async (content: string, size: number, color?: string) => {
+  const handleCopyQR = async (
+    content: string,
+    size: number,
+    color?: string,
+  ) => {
     try {
       const qrDataUrl = await QRCode.toDataURL(content, {
         width: size,
@@ -142,7 +146,11 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
     }
   };
 
-  const handleViewQR = async (content: string, size: number, color?: string) => {
+  const handleViewQR = async (
+    content: string,
+    size: number,
+    color?: string,
+  ) => {
     try {
       const qrDataUrl = await QRCode.toDataURL(content, {
         width: size,
@@ -270,14 +278,34 @@ export default function UserHistory({ activeTab }: UserHistoryProps) {
                     {item.content}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Created on {new Date(item.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} • {item.size}px
+                    Created on{" "}
+                    {new Date(item.createdAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}{" "}
+                    • {item.size}px
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => handleViewQR(item.content, item.size, item.color)} title="Preview QR Image">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleViewQR(item.content, item.size, item.color)
+                    }
+                    title="Preview QR Image"
+                  >
                     <Eye className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleCopyQR(item.content, item.size, item.color)} title="Copy QR Image to Clipboard">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleCopyQR(item.content, item.size, item.color)
+                    }
+                    title="Copy QR Image to Clipboard"
+                  >
                     <Copy className="w-4 h-4" />
                   </Button>
                   <Button

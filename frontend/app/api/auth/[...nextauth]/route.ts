@@ -35,14 +35,17 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
-            method: "POST",
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-            headers: { "Content-Type": "application/json" },
-          });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+              headers: { "Content-Type": "application/json" },
+            },
+          );
 
           const data = await res.json();
 
@@ -79,7 +82,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        
+
         if ("backendToken" in user) {
           token.backendToken = user.backendToken;
         }
@@ -87,22 +90,25 @@ export const authOptions: NextAuthOptions = {
 
       if (account?.provider === "google" && user) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: user.email,
-              name: user.name,
-              googleId: account.providerAccountId,
-              avatar: user.image,
-            }),
-          });
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: user.email,
+                name: user.name,
+                googleId: account.providerAccountId,
+                avatar: user.image,
+              }),
+            },
+          );
 
           const data = await response.json();
 
           if (response.ok && data.token) {
             token.backendToken = data.token;
-            token.id = data.user.id; 
+            token.id = data.user.id;
           }
         } catch (error) {
           console.error("Google Token Exchange Failed:", error);
@@ -111,7 +117,7 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
-    
+
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
@@ -131,7 +137,7 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, 
+    maxAge: 7 * 24 * 60 * 60,
   },
 
   pages: {

@@ -56,7 +56,9 @@ export const handleGetCurrentUser = async (req, res) => {
     });
   } catch (err) {
     console.error("Get current user error:", err);
-    res.status(500).json({ message: "Internal server error while fetching user" });
+    res
+      .status(500)
+      .json({ message: "Internal server error while fetching user" });
   }
 };
 

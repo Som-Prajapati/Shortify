@@ -14,8 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import api from "@/lib/api";
 import { generateQRImage } from "@/lib/qr-generator";
+import { createQRCode, getLogoUploadUrl } from "@/services/qrcode";
 
 interface QRGeneratorTabProps {
   isLoggedIn: boolean;
@@ -30,8 +30,8 @@ export default function QRGeneratorTab({
   const [qrType, setQrType] = useState("url");
   const [qrSize, setQrSize] = useState("250");
   const [qrColor, setQrColor] = useState("#000000");
-  const [logoType, setLogoType] = useState<"none" | "emoji" | "image">("none");
-  const [logoValue, setLogoValue] = useState("");
+  const [logoType, setLogoType] = useState<"none" | "emoji" | "logo">("none");
+  const [logoValue, setLogoValue] = useState<string | File>("");
   const [logoImagePath, setLogoImagePath] = useState("");
   const [generatedQRUrl, setGeneratedQRUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,62 +48,81 @@ export default function QRGeneratorTab({
       return;
     }
 
-    let formattedContent = qrInput.trim();
-    if (qrType === "email" && !formattedContent.startsWith("mailto:")) {
-      formattedContent = `mailto:${formattedContent}`;
-    } else if (qrType === "phone" && !formattedContent.startsWith("tel:")) {
-      formattedContent = `tel:${formattedContent}`;
-    } else if (qrType === "url" && !/^https?:\/\//i.test(formattedContent)) {
-      formattedContent = `https://${formattedContent}`;
-    }
-
     setLoading(true);
 
     try {
-      // Create it in backend
-      await api.post("/qrcode/create", {
+      let finalLogoValue = logoValue;
+      let currentLogoPath = logoImagePath;
+
+      // --- STEP 1: R2 UPLOAD (Only if it's a new file) ---
+      if (logoType === "logo" && logoValue instanceof File) {
+        toast.info("Uploading logo to cloud...");
+
+        // Get signature from your Express backend
+        const { uploadUrl, imageUrl } = await getLogoUploadUrl(
+          logoValue.name,
+          logoValue.type,
+        );
+
+        // Direct PUT to Cloudflare R2
+        await fetch(uploadUrl, {
+          method: "PUT",
+          body: logoValue,
+          headers: { "Content-Type": logoValue.type },
+        });
+
+        // Update values for MongoDB and Canvas
+        finalLogoValue = imageUrl;
+        currentLogoPath = imageUrl;
+
+        // Sync local state so regeneration doesn't re-upload
+        setLogoValue(imageUrl);
+        setLogoImagePath(imageUrl);
+      } else if (logoType === "logo" && typeof logoValue === "string") {
+        // Already uploaded - use existing URL
+        finalLogoValue = logoValue;
+        currentLogoPath = logoImagePath || logoValue;
+      }
+
+      // --- STEP 2: FORMAT CONTENT ---
+      let formattedContent = qrInput.trim();
+      if (qrType === "email" && !formattedContent.startsWith("mailto:")) {
+        formattedContent = `mailto:${formattedContent}`;
+      } else if (qrType === "phone" && !formattedContent.startsWith("tel:")) {
+        formattedContent = `tel:${formattedContent}`;
+      } else if (qrType === "url" && !/^https?:\/\//i.test(formattedContent)) {
+        formattedContent = `https://${formattedContent}`;
+      }
+
+      // --- STEP 3: SAVE TO MONGODB ---
+      await createQRCode({
         type: qrType,
         size: Number(qrSize),
         content: formattedContent,
         color: qrColor,
-        logoType,
-        logoValue,
+        logoType: logoType === "logo" ? "image" : logoType, // Mapping 'logo' to 'image' for backend
+        logoValue: typeof finalLogoValue === "string" ? finalLogoValue : "",
       });
 
-      // Generate QR Code image base64 locally
+      // --- STEP 4: GENERATE CANVAS PREVIEW ---
       const qrDataUrl = await generateQRImage({
         text: formattedContent,
         qrSize,
         qrColor,
-        logoType,
-        logoValue,
-        logoImagePath,
+        logoType: logoType === "logo" ? "image" : logoType,
+        logoValue:
+          logoType === "emoji" && typeof logoValue === "string"
+            ? logoValue
+            : "",
+        logoImagePath: currentLogoPath, // Uses DataURL (fast) or R2 URL
       });
 
       setGeneratedQRUrl(qrDataUrl);
-      toast.success("QR Code Generated & Saved Successfully!");
-
-      // Notify user-history to refresh its QR list
+      toast.success("QR Code Ready!");
       window.dispatchEvent(new Event("qrCreated"));
     } catch (error: any) {
       console.error(error);
-      if (error.response?.status === 409) {
-        // Even if it already exists, display the QR code
-        const qrDataUrl = await generateQRImage({
-          text: formattedContent,
-          qrSize,
-          qrColor,
-          logoType,
-          logoValue,
-          logoImagePath,
-        });
-        setGeneratedQRUrl(qrDataUrl);
-        toast.info(
-          "QR Code for this content was already saved. Generated locally.",
-        );
-      } else {
-        toast.error("Failed to generate/save QR Code");
-      }
+      toast.error("Process failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -263,12 +282,16 @@ export default function QRGeneratorTab({
               </label>
               <IconPicker
                 value={{
-                  type: logoType === "image" ? "logo" : logoType,
-                  value: logoValue,
+                  type: logoType,
+                  value:
+                    logoType === "emoji" && typeof logoValue === "string"
+                      ? logoValue
+                      : logoImagePath,
                   imagePath: logoImagePath,
                 }}
                 onChange={(val) => {
-                  setLogoType(val.type === "logo" ? "image" : val.type);
+                  setLogoType(val.type);
+                  // val.value can be a File (for logo) or string (for emoji)
                   setLogoValue(val.value || "");
                   setLogoImagePath(val.imagePath || "");
                   setGeneratedQRUrl("");

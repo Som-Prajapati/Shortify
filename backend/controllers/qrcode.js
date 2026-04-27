@@ -7,7 +7,15 @@ export const handleCreateQrcode = async (req, res) => {
     const { type, size, content, color, logoType, logoValue } = req.body;
     const user_id = req.user.id;
 
-    const qrcodeExists = await Qrcode.findOne({ user_id, type, size, content, color, logoType, logoValue });
+    const qrcodeExists = await Qrcode.findOne({
+      user_id,
+      type,
+      size,
+      content,
+      color,
+      logoType,
+      logoValue,
+    });
     if (qrcodeExists)
       return res.status(200).json({ message: "Qrcode already exists" });
 

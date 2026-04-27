@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ChevronDown, Ban, Smile, Image, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -102,7 +103,14 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
       "image/svg+xml",
     ];
     if (!validTypes.includes(file.type)) {
-      alert("Please upload a PNG, JPG, or SVG file");
+      toast.error("Please upload a PNG, JPG, or SVG file");
+      return;
+    }
+
+    // Check file size (1 MB = 1024 * 1024 bytes)
+    const maxSize = 1 * 1024 * 1024; // 1 MB
+    if (file.size > maxSize) {
+      toast.error("File size exceeds 1 MB. Please upload a smaller image.");
       return;
     }
 
@@ -112,7 +120,12 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
       setSelectedType("logo");
       setSelectedValue(dataUrl);
       setLogoDialogOpen(false);
-      onChange?.({ type: "logo", value: dataUrl });
+
+      onChange?.({
+        type: "logo",
+        value: file as any,
+        imagePath: dataUrl,
+      });
     };
     reader.readAsDataURL(file);
   };
@@ -293,7 +306,8 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
           <DialogHeader>
             <DialogTitle className="text-2xl">✨ Upload Your Logo</DialogTitle>
             <DialogDescription>
-              Choose a PNG, JPG, or SVG file to bring your logo to life
+              Choose a PNG, JPG, or SVG file (max 1 MB) to bring your logo to
+              life
             </DialogDescription>
           </DialogHeader>
 
@@ -344,7 +358,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
                 or click to browse your files
               </p>
               <p className="text-xs text-primary/70 mt-3 font-medium">
-                PNG • JPG • SVG
+                PNG • JPG • SVG • Max 1 MB
               </p>
             </div>
           </div>
