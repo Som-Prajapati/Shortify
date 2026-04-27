@@ -32,6 +32,7 @@ export default function QRGeneratorTab({
   const [qrColor, setQrColor] = useState("#000000");
   const [logoType, setLogoType] = useState<"none" | "emoji" | "image">("none");
   const [logoValue, setLogoValue] = useState("");
+  const [logoImagePath, setLogoImagePath] = useState("");
   const [generatedQRUrl, setGeneratedQRUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -76,6 +77,7 @@ export default function QRGeneratorTab({
         qrColor,
         logoType,
         logoValue,
+        logoImagePath,
       });
 
       setGeneratedQRUrl(qrDataUrl);
@@ -93,6 +95,7 @@ export default function QRGeneratorTab({
           qrColor,
           logoType,
           logoValue,
+          logoImagePath,
         });
         setGeneratedQRUrl(qrDataUrl);
         toast.info(
@@ -262,10 +265,12 @@ export default function QRGeneratorTab({
                 value={{
                   type: logoType === "image" ? "logo" : logoType,
                   value: logoValue,
+                  imagePath: logoImagePath,
                 }}
                 onChange={(val) => {
                   setLogoType(val.type === "logo" ? "image" : val.type);
                   setLogoValue(val.value || "");
+                  setLogoImagePath(val.imagePath || "");
                   setGeneratedQRUrl("");
                 }}
                 className="h-11 sm:h-10 [&>button]:h-full"

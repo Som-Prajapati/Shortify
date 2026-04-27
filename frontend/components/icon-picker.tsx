@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { EMOJI_CATEGORIES } from "@/lib/emoji-data";
 
 type IconType = "none" | "emoji" | "logo";
 
@@ -30,78 +31,17 @@ interface EmojiItem {
   emoji: string;
   file: string;
 }
-
-const EMOJI_CATEGORIES: any = {
-  Smileys: [
-    { emoji: "😀", file: "emoji_u1f600.png" },
-    { emoji: "😃", file: "emoji_u1f603.png" },
-    { emoji: "😄", file: "emoji_u1f604.png" },
-    { emoji: "😁", file: "emoji_u1f601.png" },
-    { emoji: "😆", file: "emoji_u1f606.png" },
-    { emoji: "😅", file: "emoji_u1f605.png" },
-    { emoji: "🤣", file: "emoji_u1f923.png" },
-    { emoji: "😂", file: "emoji_u1f602.png" },
-    { emoji: "🙂", file: "emoji_u1f642.png" },
-    { emoji: "🙃", file: "emoji_u1f643.png" },
-    { emoji: "😉", file: "emoji_u1f609.png" },
-    { emoji: "😊", file: "emoji_u1f60a.png" },
-    { emoji: "😇", file: "emoji_u1f607.png" },
-    { emoji: "🥰", file: "emoji_u1f970.png" },
-    { emoji: "😍", file: "emoji_u1f60d.png" },
-    { emoji: "🤩", file: "emoji_u1f929.png" },
-    { emoji: "😘", file: "emoji_u1f618.png" },
-    { emoji: "😗", file: "emoji_u1f617.png" },
-    { emoji: "😚", file: "emoji_u1f61a.png" },
-    { emoji: "😙", file: "emoji_u1f619.png" },
-    { emoji: "😋", file: "emoji_u1f60b.png" },
-    { emoji: "😛", file: "emoji_u1f61b.png" },
-    { emoji: "😜", file: "emoji_u1f61c.png" },
-    { emoji: "🤪", file: "emoji_u1f92a.png" },
-    { emoji: "😝", file: "emoji_u1f61d.png" },
-    { emoji: "🤑", file: "emoji_u1f911.png" },
-    { emoji: "🤗", file: "emoji_u1f917.png" },
-    { emoji: "🤭", file: "emoji_u1f92d.png" },
-    { emoji: "🤫", file: "emoji_u1f92b.png" },
-    { emoji: "🤔", file: "emoji_u1f914.png" },
-    { emoji: "🤐", file: "emoji_u1f910.png" },
-    { emoji: "🤨", file: "emoji_u1f928.png" },
-    { emoji: "😐", file: "emoji_u1f610.png" },
-    { emoji: "😑", file: "emoji_u1f611.png" },
-    { emoji: "😶", file: "emoji_u1f636.png" },
-    { emoji: "😏", file: "emoji_u1f60f.png" },
-    { emoji: "😒", file: "emoji_u1f612.png" },
-    { emoji: "🙄", file: "emoji_u1f644.png" },
-    { emoji: "😬", file: "emoji_u1f62c.png" },
-    { emoji: "🤥", file: "emoji_u1f925.png" },
-    { emoji: "😌", file: "emoji_u1f60c.png" },
-    { emoji: "😔", file: "emoji_u1f614.png" },
-    { emoji: "😪", file: "emoji_u1f62a.png" },
-    { emoji: "🤤", file: "emoji_u1f924.png" },
-    { emoji: "😴", file: "emoji_u1f634.png" },
-    { emoji: "😷", file: "emoji_u1f637.png" },
-    { emoji: "🤒", file: "emoji_u1f912.png" },
-    { emoji: "🤕", file: "emoji_u1f915.png" },
-    { emoji: "🤢", file: "emoji_u1f922.png" },
-    { emoji: "🤮", file: "emoji_u1f92e.png" },
-    { emoji: "🥵", file: "emoji_u1f975.png" },
-    { emoji: "🥶", file: "emoji_u1f976.png" },
-    { emoji: "🥴", file: "emoji_u1f974.png" },
-    { emoji: "😵", file: "emoji_u1f635.png" },
-    { emoji: "🤯", file: "emoji_u1f92f.png" },
-    { emoji: "🤠", file: "emoji_u1f920.png" },
-    { emoji: "🥳", file: "emoji_u1f973.png" },
-    { emoji: "😎", file: "emoji_u1f60e.png" },
-    { emoji: "🤓", file: "emoji_u1f913.png" },
-    { emoji: "🧐", file: "emoji_u1f9d0.png" },
-  ],
-};
 function emojiToCodePoint(emoji: string) {
   return [...emoji].map((c) => c.codePointAt(0)?.toString(16)).join("-");
 }
 
 interface IconPickerProps {
-  value?: { type: IconType; value?: string };
-  onChange?: (value: { type: IconType; value?: string }) => void;
+  value?: { type: IconType; value?: string; imagePath?: string };
+  onChange?: (value: {
+    type: IconType;
+    value?: string;
+    imagePath?: string;
+  }) => void;
   className?: string;
 }
 
@@ -112,31 +52,104 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
   const [selectedValue, setSelectedValue] = React.useState<string | undefined>(
     value?.value,
   );
+  const [selectedImagePath, setSelectedImagePath] = React.useState<
+    string | undefined
+  >(value?.imagePath);
   const [logoDialogOpen, setLogoDialogOpen] = React.useState(false);
   const [customEmoji, setCustomEmoji] = React.useState("");
-  const [activeCategory, setActiveCategory] = React.useState("Smileys");
-
+  const [activeCategory, setActiveCategory] = React.useState(
+    Object.keys(EMOJI_CATEGORIES)[0],
+  );
+  const [dragActive, setDragActive] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Sync state when value prop changes
+  React.useEffect(() => {
+    if (value?.type) {
+      setSelectedType(value.type);
+      setSelectedValue(value.value);
+      setSelectedImagePath(value.imagePath);
+    }
+  }, [value]);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+    setLogoDialogOpen(false);
+  };
+
+  const processFile = (file: File) => {
+    const validTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/svg+xml",
+    ];
+    if (!validTypes.includes(file.type)) {
+      alert("Please upload a PNG, JPG, or SVG file");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setSelectedType("logo");
+      setSelectedValue(dataUrl);
+      setLogoDialogOpen(false);
+      onChange?.({ type: "logo", value: dataUrl });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
 
   const handleTypeSelect = (type: IconType) => {
     if (type === "none") {
       setSelectedType("none");
       setSelectedValue(undefined);
+      setSelectedImagePath(undefined);
       onChange?.({ type: "none" });
     } else if (type === "logo") {
       setLogoDialogOpen(true);
     }
   };
 
-  const handleEmojiSelect = (emoji: string) => {
+  const handleEmojiSelect = (emoji: string, filePath: string) => {
     setSelectedType("emoji");
     setSelectedValue(emoji);
-    onChange?.({ type: "emoji", value: emoji });
+    setSelectedImagePath(`/emojis/${filePath}`);
+    onChange?.({
+      type: "emoji",
+      value: emoji,
+      imagePath: `/emojis/${filePath}`,
+    });
   };
 
   const handleCustomEmojiSubmit = () => {
     if (customEmoji.trim()) {
-      handleEmojiSelect(customEmoji.trim());
+      const code = emojiToCodePoint(customEmoji.trim());
+      handleEmojiSelect(customEmoji.trim(), `emoji_u${code}.png`);
       setCustomEmoji("");
     }
   };
@@ -159,7 +172,10 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
     if (selectedType === "emoji") {
       return (
         <>
-          <img src={getEmojiSrc(selectedValue)} className="size-5" />
+          <img
+            src={selectedImagePath || getEmojiSrc(selectedValue)}
+            className="size-5"
+          />
           <span>Emoji</span>
         </>
       );
@@ -179,13 +195,16 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
     <div className={cn("inline-flex", className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2 rounded-xl border-2 border-border/50  bg-white dark:bg-input/30 hover:bg-transparent dark:hover:bg-transparent hover:text-current"
+          >
             {getDisplayContent()}
             <ChevronDown className="size-4" />
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="start" className="w-20">
+        <DropdownMenuContent align="start" className="w-20 rounded-lg">
           <DropdownMenuItem onClick={() => handleTypeSelect("none")}>
             <Ban className="size-4" />
             <span>None</span>
@@ -199,7 +218,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             </DropdownMenuSubTrigger>
 
             <DropdownMenuPortal>
-              <DropdownMenuSubContent className="w-80 p-0">
+              <DropdownMenuSubContent className="w-80 p-0 rounded-lg">
                 <div className="p-3 border-b font-medium text-sm">
                   Select Emoji
                 </div>
@@ -229,12 +248,15 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
                       (item: any, i: any) => (
                         <button
                           key={i}
-                          onClick={() => handleEmojiSelect(item.emoji)}
+                          onClick={() =>
+                            handleEmojiSelect(item.emoji, item.file)
+                          }
                           className="size-8 flex items-center justify-center rounded hover:bg-accent"
                         >
                           <img
                             src={`/emojis/${item.file}`}
                             className="size-6"
+                            alt={item.emoji}
                           />
                         </button>
                       ),
@@ -264,6 +286,84 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Logo Upload Dialog */}
+      <Dialog open={logoDialogOpen} onOpenChange={setLogoDialogOpen}>
+        <DialogContent className="sm:max-w-md animate-in zoom-in-95 duration-200">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">✨ Upload Your Logo</DialogTitle>
+            <DialogDescription>
+              Choose a PNG, JPG, or SVG file to bring your logo to life
+            </DialogDescription>
+          </DialogHeader>
+
+          <div
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={cn(
+              "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 relative overflow-hidden group",
+              dragActive
+                ? "border-primary bg-gradient-to-br from-primary/10 to-primary/5 scale-[1.02] shadow-lg"
+                : "border-primary/30 hover:border-primary/60 hover:bg-primary/5",
+            )}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".png,.jpg,.jpeg,.svg"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <div className="relative z-10">
+              <div
+                className={cn(
+                  "inline-flex items-center justify-center size-16 rounded-full mb-4 transition-all duration-300",
+                  dragActive
+                    ? "bg-primary/20 scale-110"
+                    : "bg-primary/10 group-hover:bg-primary/15 group-hover:scale-105",
+                )}
+              >
+                <Upload
+                  className={cn(
+                    "transition-all duration-300",
+                    dragActive
+                      ? "size-8 text-primary animate-bounce"
+                      : "size-8 text-primary/70 group-hover:text-primary",
+                  )}
+                />
+              </div>
+              <p className="text-base font-semibold text-foreground">
+                {dragActive
+                  ? "🎯 Drop your image here!"
+                  : "Drag & drop your logo"}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                or click to browse your files
+              </p>
+              <p className="text-xs text-primary/70 mt-3 font-medium">
+                PNG • JPG • SVG
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setLogoDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => fileInputRef.current?.click()}
+              className="gap-2"
+            >
+              <Upload className="size-4" />
+              Browse Files
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
